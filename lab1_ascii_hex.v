@@ -42,6 +42,11 @@ always@(*)
             HEX = 4'hA;
             HEX_FLG = 1'b1;
         end
+
+        default: begin
+            HEX_FLG = 1'b0;
+            HEX = 4'hF;
+        end
     endcase
 
 endmodule
