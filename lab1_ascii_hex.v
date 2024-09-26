@@ -26,6 +26,14 @@ module BS_DEV_ASCII_HEX(
     output reg HEX_FLG
 );
 
+    
+assign HEX_FLG =   (ASCII == 8'h30) |
+                   (ASCII == 8'h31) | 
+                   (ASCII == 8'h32) | 
+                   (ASCII == 8'h33) | 
+                   (ASCII == 8'h34) | 
+                   (ASCII == 8'h35);
+
 always@(*)
     case(ASCII)
         8'h30: begin
