@@ -20,18 +20,20 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module dtr(
+module dtr #(
+    parameter WDT = 7
+) (
     input CLK,
-    input D,
+    input [WDT - 1 : 0]D,
     input RST,
     input EN,
-    output reg Q
+    output reg [WDT - 1 : 0]Q
 );
 
 //always@(posedge CLK) sync rest
 always@(posedge CLK, posedge RST) // async
     if (RST)
-        Q <= 1'b0;
+        Q <= {WDT{1'b0}}; // OR  Q <= 0;
     else if (EN)
         Q <= D;
 
