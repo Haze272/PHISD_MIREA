@@ -23,10 +23,16 @@
 module dtr(
     input CLK,
     input D,
+    input RST,
+    input EN,
     output reg Q
 );
 
-always@(posedge CLK)
-    Q <= D;
+//always@(posedge CLK) sync rest
+always@(posedge CLK, posedge RST) // async
+    if (RST)
+        Q <= 1'b0;
+    else if (EN)
+        Q <= D;
 
 endmodule
