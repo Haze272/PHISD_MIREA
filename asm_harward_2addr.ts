@@ -53,6 +53,7 @@ class HarvardArchitectureEmulator {
 }
 
 // Задание 1: Сумма элементов массива
+
 const sumEmulator = new HarvardArchitectureEmulator(10);
 sumEmulator.loadData([1, 2, 3, 4, 5, 0, 0, 0, 0, 0]);
 sumEmulator.loadInstructions([
@@ -78,19 +79,53 @@ const arr1 = [1, 2, 3, 4, 5];
 const arr2 = [1, -1, 1, -1, 1];
 const convolutionEmulator = new HarvardArchitectureEmulator(20);
 
-convolutionEmulator.loadData([
-  ...arr1,
-  ...arr2,
-  0, 0, 0, 0, 0,
-]);
-convolutionEmulator.loadInstructions([
-  "LOAD R1 0", "LOAD R2 5", "MUL R1 R2", "ADD ACC R1", // Элемент 1
-  "LOAD R1 1", "LOAD R2 6", "MUL R1 R2", "ADD ACC R1", // Элемент 2
-  "LOAD R1 2", "LOAD R2 7", "MUL R1 R2", "ADD ACC R1", // Элемент 3
-  "LOAD R1 3", "LOAD R2 8", "MUL R1 R2", "ADD ACC R1", // Элемент 4
-  "LOAD R1 4", "LOAD R2 9", "MUL R1 R2", "ADD ACC R1", // Элемент 5
-  "STORE ACC 10" // Сохранение результата в память
-]);
+convolutionEmulator.loadData([...arr1, ...arr2, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
+const instructions = [];
+const arr1Length = arr1.length;
+const arr2Length = arr2.length;
+const resultStartIndex = arr1Length + arr2Length;
+
+for (let shift = 0; shift < arr1Length + arr2Length - 1; shift++) {
+  instructions.push("RESET ACC");
+  for (let i = 0; i < arr1Length; i++) {
+    const j = shift - i; // Сдвиг
+    if (j >= 0 && j < arr2Length) {
+      instructions.push(`LOAD R1 ${i}`);
+      instructions.push(`LOAD R2 ${arr1Length + j}`);
+      instructions.push(`MUL R1 R2`);
+      instructions.push(`ADD ACC R1`);
+    }
+  }
+  instructions.push(`STORE ACC ${resultStartIndex + shift}`);
+}
+
+convolutionEmulator.loadInstructions(instructions);
 convolutionEmulator.execute();
-console.log("Свертка массива:", convolutionEmulator.getData()[10]);
+
+const result = convolutionEmulator
+  .getData()
+  .slice(resultStartIndex, resultStartIndex + arr1Length + arr2Length - 1);
+
+console.log("Полная свёртка:", result);
+
+
+// function convolve(arr1: number[], arr2: number[]): number[] {
+//   const n1 = arr1.length;
+//   const n2 = arr2.length;
+//   const resultLength = n1 + n2 - 1; // Длина результирующего массива
+//   const result = new Array(resultLength).fill(0);
+
+//   for (let i = 0; i < resultLength; i++) {
+//     for (let j = 0; j < n1; j++) {
+//       const k = i - j;
+//       if (k >= 0 && k < n2) { // Проверяем, что индекс k в пределах второго массива
+//         result[i] += arr1[j] * arr2[k];
+//       }
+//     }
+//   }
+//   return result;
+// }
+
+// const result1 = convolve(arr1, arr2);
+// console.log("Результат свёртки:", result1);
